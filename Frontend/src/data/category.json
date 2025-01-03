@@ -1,0 +1,42 @@
+[
+  {
+    "uuid": "887435c0-c6be-4249-b5a2-3d4186dc9a8a",
+    "name": "Action",
+    "icon": "game-icons:ammonite-fossil"
+  },
+  {
+    "uuid": "51900f76-532d-488f-8c5f-2223dcbc425f",
+    "name": "Adventure",
+    "icon": "game-icons:abstract-035"
+  },
+  {
+    "uuid": "63ec9717-7a65-4759-9c20-0cdd110ce96a",
+    "name": "Role-Playing",
+    "icon": "game-icons:abstract-037"
+  },
+  {
+    "uuid": "529f8e4e-4923-46bd-bb2d-38c523d5332c",
+    "name": "Simulation",
+    "icon": "game-icons:abstract-038"
+  },
+  {
+    "uuid": "38096ebd-0869-412d-9f17-d016226eafa3",
+    "name": "Strategy",
+    "icon": "game-icons:abstract-040"
+  },
+  {
+    "uuid": "d1449d2c-51b1-4a5f-b80e-36828b16f135",
+    "name": "Sports",
+    "icon": "game-icons:abstract-041"
+  },
+  {
+    "uuid": "67759146-64c3-426d-9e82-a5146cf00c4d",
+    "name": "Puzzle",
+    "icon": "game-icons:abstract-042"
+  },
+  {
+    "uuid": "34315d53-9d68-4788-b0c7-d27b09e0e387",
+    "name": "Racing",
+    "icon": "game-icons:abstract-043"
+  }
+]
