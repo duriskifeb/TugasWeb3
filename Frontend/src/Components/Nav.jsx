@@ -3,7 +3,7 @@ import Logo from "../assets/LogoIconWeb.png";
 import { Button, Dropdown } from "antd";
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
-import LogoutController from "../Controller/user"; // Pastikan LogoutController sesuai dengan kode yang Anda buat
+import LogoutController from "../Controller/user"; 
 
 export default function Navbar({ className }) {
   const { pathname } = useLocation();
@@ -13,15 +13,15 @@ export default function Navbar({ className }) {
     { name: "Home", route: "/" },
     { name: "Form", route: "/form" },
     { name: "History", route: "/history" },
+    { name: "Profile", route: "/profile" },
   ]);
 
   useEffect(() => {
-    // Anda dapat menambahkan logika tambahan di sini
-    // Untuk mengambil data pengguna atau kategori, jika diperlukan.
+    //TODO
   }, []);
 
   const handleLogout = () => {
-    LogoutController(navigate); // Pastikan controller logout berjalan sesuai keinginan
+    LogoutController(navigate); 
   };
 
   return (

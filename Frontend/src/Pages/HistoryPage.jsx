@@ -3,7 +3,8 @@ import Navbar from "../Components/Nav";
 
 const HistoryPage = () => {
   const [salesHistory, setSalesHistory] = useState([]);
-  const [editProduct, setEditProduct] = useState(null); // Menyimpan produk yang sedang diedit
+  const [penjualanHistory, setPenjualanHistory] = useState([]);
+  const [editProduct, setEditProduct] = useState(null);
   const [updatedProduct, setUpdatedProduct] = useState({
     kode_produk: "",
     nama: "",
@@ -12,111 +13,73 @@ const HistoryPage = () => {
     stok: "",
     status: "",
   });
-  const [isModalOpen, setIsModalOpen] = useState(false); // Mengontrol status modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fungsi untuk mengambil data dari API menggunakan fetch
+  // Fungsi untuk mengambil data produk
   const fetchSalesHistory = async () => {
     try {
-      const response = await fetch("http://localhost:5000/product/viewAll"); // Sesuaikan URL dengan endpoint Anda
+      const response = await fetch("http://localhost:5000/product/viewAll");
       const data = await response.json();
-      setSalesHistory(data); // Menyimpan data ke state
+      setSalesHistory(data);
     } catch (error) {
       console.error("Failed to fetch sales history:", error.message);
     }
   };
 
-  // Fungsi untuk meng-handle perubahan input form
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUpdatedProduct((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  // Fungsi untuk menangani klik tombol edit dan membuka modal
-  const handleEditClick = (product) => {
-    setEditProduct(product); // Menyimpan produk yang akan diedit
-    setUpdatedProduct({
-      kode_produk: product.kode_produk,
-      nama: product.nama,
-      kategori: product.kategori,
-      harga: product.harga,
-      stok: product.stok,
-      status: product.status,
-    });
-    setIsModalOpen(true); // Membuka modal
-  };
-
-  // Fungsi untuk menyimpan perubahan ke backend
-  const handleUpdate = async () => {
+  // Fungsi untuk mengambil data penjualan
+  const fetchPenjualanHistory = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/product/edit/${editProduct.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedProduct),
-        }
-      );
-
-      if (response.ok) {
-        alert("Produk berhasil diperbarui!");
-        fetchSalesHistory(); // Ambil data terbaru setelah update
-        setIsModalOpen(false); // Tutup modal
-      } else {
-        alert("Gagal memperbarui produk.");
-      }
+      const response = await fetch("http://localhost:5000/penjual/all");
+      const data = await response.json();
+      setPenjualanHistory(data);
     } catch (error) {
-      console.error("Failed to update product:", error.message);
+      console.error("Failed to fetch penjualan history:", error.message);
     }
   };
 
-  // Fungsi untuk menangani penghapusan produk
-  const handleDelete = async (productId) => {
+  // Fungsi untuk menghapus penjualan
+  const handleDeletePenjualan = async (idPenjualan) => {
     const confirmDelete = window.confirm(
-      "Apakah Anda yakin ingin menghapus produk ini?"
+      "Apakah Anda yakin ingin menghapus penjualan ini?"
     );
 
     if (confirmDelete) {
       try {
         const response = await fetch(
-          `http://localhost:5000/product/delete/${productId}`,
+          `http://localhost:5000/penjual/delete/${idPenjualan}`,
           {
             method: "DELETE",
           }
         );
 
         if (response.ok) {
-          alert("Produk berhasil dihapus!");
-          fetchSalesHistory(); // Ambil data terbaru setelah dihapus
+          alert("Penjualan berhasil dihapus!");
+          fetchPenjualanHistory(); // Ambil data terbaru setelah dihapus
         } else {
-          alert("Gagal menghapus produk.");
+          alert("Gagal menghapus penjualan.");
         }
       } catch (error) {
-        console.error("Failed to delete product:", error.message);
-        alert(`Gagal menghapus produk: ${error.message}`);
+        console.error("Failed to delete penjualan:", error.message);
+        alert(`Gagal menghapus penjualan: ${error.message}`);
       }
     }
   };
 
-  // Ambil data ketika komponen dimuat
+  // Mengambil data saat komponen dimuat
   useEffect(() => {
     fetchSalesHistory();
-  }, []); // [] memastikan fungsi hanya dijalankan sekali saat komponen dimuat
+    fetchPenjualanHistory();
+  }, []);
 
-  // Fungsi untuk menutup modal
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  // ... (kode lainnya tetap sama)
 
   return (
     <div className="p-0 mt-3">
       <Navbar className="mt-0" />
       <h1 className="text-2xl font-bold mb-6">History Penjualan</h1>
 
+      {/* Tabel Produk */}
+      <h2 className="text-xl font-bold mb-4">Data Produk</h2>
       {salesHistory.length > 0 ? (
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
@@ -127,7 +90,7 @@ const HistoryPage = () => {
               <th className="py-2 px-4 border-b">Harga</th>
               <th className="py-2 px-4 border-b">Stok</th>
               <th className="py-2 px-4 border-b">Status</th>
-              <th className="py-2 px-4 border-b">Aksi</th> {/* Kolom aksi */}
+              <th className="py-2 px-4 border-b">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -147,7 +110,7 @@ const HistoryPage = () => {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(product.id)} // Menambahkan tombol delete
+                    onClick={() => handleDelete(product.id)}
                     className="bg-red-500 text-white px-4 py-2 rounded"
                   >
                     Delete
@@ -161,75 +124,57 @@ const HistoryPage = () => {
         <p className="text-gray-500">Belum ada data produk.</p>
       )}
 
-      {/* Modal Edit */}
+      {/* Tabel Penjualan */}
+      <h2 className="text-xl font-bold mt-8 mb-4">Data Penjualan</h2>
+      {penjualanHistory.length > 0 ? (
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b">Kode Transaksi</th>
+              <th className="py-2 px-4 border-b">Nama Produk</th>
+              <th className="py-2 px-4 border-b">Sales ID</th>
+              <th className="py-2 px-4 border-b">Jumlah</th>
+              <th className="py-2 px-4 border-b">Total Harga</th>
+              <th className="py-2 px-4 border-b">Nama Customer</th>
+              <th className="py-2 px-4 border-b">Aksi</th>{" "}
+              {/* Kolom baru untuk aksi */}
+            </tr>
+          </thead>
+          <tbody>
+            {penjualanHistory.map((penjualan) => (
+              <tr key={penjualan.idPenjualan} className="hover:bg-gray-100">
+                <td className="py-2 px-4 border-b">
+                  {penjualan.kode_transaksi}
+                </td>
+                <td className="py-2 px-4 border-b">{penjualan.nama_produk}</td>
+                <td className="py-2 px-4 border-b">{penjualan.sales_id}</td>
+                <td className="py-2 px-4 border-b">{penjualan.jumlah}</td>
+                <td className="py-2 px-4 border-b">{penjualan.total_harga}</td>
+                <td className="py-2 px-4 border-b">
+                  {penjualan.nama_customer}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  <button
+                    onClick={() => handleDeletePenjualan(penjualan.idPenjualan)}
+                    className="bg-red-500 text-white px-4 py-2 rounded"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="text-gray-500">Belum ada data penjualan.</p>
+      )}
+
+      {/* Modal Edit (kode modal tetap sama) */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <h2 className="text-xl font-bold mb-4">Edit Produk</h2>
-            <div>
-              <label>Nama Produk</label>
-              <input
-                type="text"
-                name="nama"
-                value={updatedProduct.nama}
-                onChange={handleInputChange}
-                className="block w-full mb-4 p-2 border"
-              />
-            </div>
-            <div>
-              <label>Kategori</label>
-              <input
-                type="text"
-                name="kategori"
-                value={updatedProduct.kategori}
-                onChange={handleInputChange}
-                className="block w-full mb-4 p-2 border"
-              />
-            </div>
-            <div>
-              <label>Harga</label>
-              <input
-                type="number"
-                name="harga"
-                value={updatedProduct.harga}
-                onChange={handleInputChange}
-                className="block w-full mb-4 p-2 border"
-              />
-            </div>
-            <div>
-              <label>Stok</label>
-              <input
-                type="number"
-                name="stok"
-                value={updatedProduct.stok}
-                onChange={handleInputChange}
-                className="block w-full mb-4 p-2 border"
-              />
-            </div>
-            <div>
-              <label>Status</label>
-              <select
-                name="status"
-                value={updatedProduct.status}
-                onChange={handleInputChange}
-                className="block w-full mb-4 p-2 border"
-              >
-                <option value="aktif">Aktif</option>
-                <option value="nonactive">Nonaktif</option>
-              </select>
-            </div>
-            <button
-              onClick={handleUpdate}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Update Produk
-            </button>
-            <button
-              onClick={closeModal}
-              className="bg-red-500 text-white px-4 py-2 rounded ml-2"
-            >
-              Cancel
-            </button>
+            {/* ... (kode modal tetap sama) */}
           </div>
         </div>
       )}

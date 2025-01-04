@@ -45,6 +45,28 @@ export const createPenjualan = async (req, res) => {
   }
 };
 
+// Mengambil semua data penjualan
+export const getAllPenjualan = async (req, res) => {
+  try {
+    const query = `
+      SELECT penjualan.*, produk.nama AS nama_produk
+      FROM penjualan
+      JOIN produk ON penjualan.produk_id = produk.id
+    `;
+
+    const [rows] = await db.execute(query);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Tidak ada data penjualan." });
+    }
+
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Terjadi kesalahan pada server." });
+  }
+};
+
 
 // export const deletePenjualan = async (req, res) => {
 //   try {

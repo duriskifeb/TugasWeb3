@@ -57,6 +57,24 @@ export default function Login() {
   }
 };
       
+// Contoh di halaman login
+const handleLogin = async () => {
+  const response = await fetch("http://localhost:5000/user/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await response.json();
+  if (response.ok) {
+    localStorage.setItem("user", JSON.stringify(data.user)); // Simpan data pengguna di localStorage
+    navigate("/profile"); // Arahkan ke halaman profil
+  } else {
+    console.error("Login gagal:", data.message);
+  }
+};
 
   return (
     <>

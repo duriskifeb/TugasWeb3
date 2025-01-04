@@ -1,6 +1,11 @@
 import express from "express";
 const router = express.Router();
-import { createPenjualan ,getPenjualanBySales, deletePenjualan } from "../controllers/penjualanController.js";
+import {
+  createPenjualan,
+  getPenjualanBySales,
+  deletePenjualan,
+  getAllPenjualan,
+} from "../controllers/penjualanController.js";
 
 // Route untuk input penjualan
 router.post("/create", createPenjualan);
@@ -11,6 +16,7 @@ router.get(
 
 router.delete("/delete/:penjualan_id", deletePenjualan);
 
+router.get("/all", getAllPenjualan);
 
 export default router;
 

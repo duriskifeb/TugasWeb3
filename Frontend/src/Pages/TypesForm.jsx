@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import Navbar from "../Components/Nav";
-import { BookOpen, Briefcase, User } from "lucide-react";
+import { BookOpen, User } from "lucide-react";
 import image1 from "../assets/Sale1.png";
 import image2 from "../assets/Sale2.png";
-import image3 from "../assets/Sales.png";
 import SalesForm from "../Components/SalesForm";
 import ProductForm from "../Components/ProductForm";
-import TransactionForm from "../Components/TransactionForm";
 
 const FormCard = ({ card, onClick }) => {
   return (
@@ -52,15 +50,12 @@ const FormCard = ({ card, onClick }) => {
 const Forms = () => {
   const [isSalesFormOpen, setIsSalesFormOpen] = useState(false);
   const [isProductFormOpen, setIsProductFormOpen] = useState(false);
-  const [isTransactionFormOpen, setIsTransactionFormOpen] = useState(false);
 
   const handleCardClick = (route) => {
     if (route === "/sales-form") {
       setIsSalesFormOpen(true);
     } else if (route === "/product-form") {
       setIsProductFormOpen(true);
-    } else if (route === "/transaction-form") {
-      setIsTransactionFormOpen(true);
     } else {
       console.log(`Navigating to: ${route}`);
     }
@@ -85,15 +80,6 @@ const Forms = () => {
       route: "/product-form",
       imageUrl: image2,
     },
-    {
-      id: 3,
-      title: "Form Transaksi Penjualan",
-      Icon: Briefcase,
-      description:
-        "Penjualan Transaksi barang anda bisa diakses di sini dengan segala apapun yang ada",
-      route: "/transaction-form",
-      imageUrl: image3,
-    },
   ];
 
   return (
@@ -101,8 +87,10 @@ const Forms = () => {
       <Navbar className="mt-0" />
 
       <div className="max-w-7xl mx-auto px-4 py-12 mt-5">
-        <h2 className="text-2xl font-bold text-white mb-8">Select a Form</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h2 className="text-2xl font-bold text-white mb-8 text-center">
+          Select a Form
+        </h2>
+        <div className="flex justify-center items-center gap-6">
           {cardData.map((card) => (
             <FormCard key={card.id} card={card} onClick={handleCardClick} />
           ))}
@@ -118,11 +106,6 @@ const Forms = () => {
       <ProductForm
         isOpen={isProductFormOpen}
         onRequestClose={() => setIsProductFormOpen(false)}
-      />
-
-      <TransactionForm
-        isOpen={isTransactionFormOpen}
-        onRequestClose={() => setIsTransactionFormOpen(false)}
       />
     </>
   );

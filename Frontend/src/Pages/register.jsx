@@ -3,6 +3,7 @@ import { Icon } from "@iconify/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Input } from "../Components/Form";
+import { message } from "antd"; // Tambahkan message dari antd untuk notifikasi
 
 export default function Register() {
   const navigate = useNavigate();
@@ -25,15 +26,30 @@ export default function Register() {
 
   const Submit = async (e) => {
     e.preventDefault();
+
+    // Validasi input
+    if (
+      !Values.first_name ||
+      !Values.last_name ||
+      !Values.email ||
+      !Values.phone_number ||
+      !Values.password
+    ) {
+      message.error("Harap isi semua field yang wajib!");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:5000/user/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Values),
       });
+
       const data = await response.json();
 
       if (response.ok) {
+        message.success("Registrasi berhasil!");
         setValues({
           first_name: "",
           last_name: "",
@@ -41,15 +57,17 @@ export default function Register() {
           phone_number: "",
           password: "",
         });
-        navigate("/login");
+        navigate("/login"); // Arahkan ke halaman login setelah registrasi
       } else {
         setRespond({ status: false, error: data });
+        message.error(data.message || "Registrasi gagal. Coba lagi!");
       }
     } catch (error) {
       setRespond({
         status: false,
         error: { message: "Registrasi gagal. Coba lagi!" },
       });
+      message.error("Terjadi kesalahan saat registrasi.");
     }
   };
 
