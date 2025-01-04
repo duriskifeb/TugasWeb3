@@ -17,7 +17,6 @@ export const createPenjualan = async (req, res) => {
       return res.status(400).json({ message: "Semua field wajib diisi!" });
     }
 
-    console.log("Received data from frontend:", req.body);
 
     const values = [
       kode_transaksi || null,
@@ -35,7 +34,7 @@ export const createPenjualan = async (req, res) => {
 
     const [result] = await db.execute(query, values);
 
-    console.log("Query executed successfully:", result);
+    // console.log("Query executed successfully:", result);
     res.status(201).json({ message: "Penjualan berhasil ditambahkan!" });
   } catch (error) {
     console.error("Error occurred:", error);
