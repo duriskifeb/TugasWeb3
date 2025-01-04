@@ -6,7 +6,7 @@ import Login from "./Pages/login.jsx";
 import Register from "./Pages/register.jsx";
 import Pll from "./Pages/main.jsx"; // Pastikan ini adalah komponen utama Anda
 import { ConfigProvider, theme } from "antd";
-import Profile from "./Pages/Profile.jsx";
+// import Profile from "./Pages/Profile.jsx";
 import Formu from "./Pages/TypesForm.jsx";
 import History from "./Pages/HistoryPage.jsx";
 import Page404 from "./Pages/Page404.jsx";
@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")).render(
           <Route index element={<Pll />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
+          {/* <Route path="/profile" element={<Profile />} /> */}
           <Route path="/form" element={<Formu />} />
           <Route path="/history" element={<History />} />
           <Route path="*" element={<Page404 />} />

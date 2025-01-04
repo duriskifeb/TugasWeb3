@@ -14,17 +14,8 @@ export const createProduct = async (req, res) => {
   } = req.body;
   try {
     await db.execute(
-      "INSERT INTO produk (kode_produk, nama, kategori, harga, stok, deskripsi, status,  user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      [
-        kode_produk,
-        nama,
-        kategori,
-        harga,
-        stok,
-        deskripsi,
-        status,
-        user_id,
-      ]
+      "INSERT INTO produk (kode_produk, nama, kategori, harga, stok, deskripsi, status, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [kode_produk, nama, kategori, harga, stok, deskripsi, status, user_id]
     );
     res.status(201).json({ message: "Product created successfully" });
   } catch (error) {
@@ -66,24 +57,12 @@ export const updateProduct = async (req, res) => {
     stok,
     deskripsi,
     status,
-    gambar,
     user_id,
   } = req.body;
   try {
     await db.execute(
-      "UPDATE produk SET kode_produk = ?, nama = ?, kategori = ?, harga = ?, stok = ?, deskripsi = ?, status = ?, gambar = ?, user_id = ? WHERE id = ?",
-      [
-        kode_produk,
-        nama,
-        kategori,
-        harga,
-        stok,
-        deskripsi,
-        status,
-        gambar,
-        user_id,
-        id,
-      ]
+      "UPDATE produk SET kode_produk = ?, nama = ?, kategori = ?, harga = ?, stok = ?, deskripsi = ?, status = ?, user_id = ? WHERE id = ?",
+      [kode_produk, nama, kategori, harga, stok, deskripsi, status, user_id, id]
     );
     res.status(200).json({ message: "Product updated successfully" });
   } catch (error) {

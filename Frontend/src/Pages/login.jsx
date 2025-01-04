@@ -1,51 +1,62 @@
 import LoginPage from "../assets/backround.png";
 import LoginCoder2 from "../assets/layersLogis.png";
-import { Button, Checkbox, Flex } from "antd";
+import { Checkbox, Flex } from "antd";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Link, useNavigate } from "react-router-dom"; // Perbaikan import
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "../Components/Form";
-import { useEffect, useState } from "react";
-import { GuestController, LoginController } from "../Controller/User";
+import { useState } from "react";
 
 export default function Login() {
-  // Perbaikan nama komponen
-  let navigate = useNavigate();
-  let [Respond, setRespond] = useState({ status: null, error: null });
-  let [Values, setValues] = useState({
+  const navigate = useNavigate();
+  const [Respond, setRespond] = useState({ status: null, error: null });
+  const [Values, setValues] = useState({
     email: "",
     password: "",
     remember: false,
   });
+  const [Psw, SetPsw] = useState(false);
 
-  let [Psw, SetPsw] = useState(false);
-
-  function handleChange(key, value) {
+  const handleChange = (key, value) => {
     setValues((values) => ({
       ...values,
       [key]: value,
     }));
-  }
+  };
 
-  async function Submit(e) {
-    e.preventDefault(); // Mencegah reload halaman
-    setRespond({ status: null, error: null }); // Reset state Respond
+  const Submit = async (e) => {
+  e.preventDefault();
+  setRespond({ status: null, error: null });
 
-    let data = await LoginController(Values); // Gunakan await
-    if (data.status === true) {
-      setValues({
-        email: "",
-        password: "",
-        remember: false,
-      });
-      navigate("/");
+  try {
+    const response = await fetch("http://localhost:5000/user/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: Values.email,
+        password: Values.password,
+      }),
+    });
+    
+    const data = await response.json();
+    console.log('Response Data:', data); // Debugging: Check if response is correct
+    
+    if (response.ok) {
+      setValues({ email: "", password: "", remember: false });
+      console.log("Redirecting to Home"); // Debugging: Check if redirection is called
+      navigate("/"); // Redirect to home page
     } else {
-      setRespond(data); // Tampilkan pesan error
+      setRespond({ status: false, error: data.message });
+      console.log("Error:", data.message); // Debugging: Check what error message was returned
     }
+  } catch (error) {
+    setRespond({
+      status: false,
+      error: { message: "Login gagal. Coba lagi!" },
+    });
+    console.log("Error in Fetch:", error); // Debugging: Check fetch error
   }
-
-  useEffect(() => {
-    GuestController(navigate);
-  }, [navigate]); // Tambahkan dependency array
+};
+      
 
   return (
     <>
@@ -59,11 +70,10 @@ export default function Login() {
           <img src={LoginCoder2} alt="Logo" className="h-14 mb-8" />
           <p className="text-white font-bold text-3xl text-center">
             Welcome, Sales Direct
-            <span className="font-medium ms-2"></span>
           </p>
           <form onSubmit={Submit} className="w-[400px] mt-5">
             <Input
-              error={Respond.error?.email?.[0] ?? ""}
+              error={Respond.error?.email ?? ""}
               className={"my-6"}
               value={Values.email}
               onInput={(e) => handleChange("email", e.target.value)}
@@ -71,7 +81,7 @@ export default function Login() {
               placeholder={"Email"}
             />
             <Input
-              error={Respond.error?.password?.[0] ?? ""}
+              error={Respond.error?.password ?? ""}
               className={"my-6"}
               value={Values.password}
               onInput={(e) => handleChange("password", e.target.value)}
@@ -93,7 +103,7 @@ export default function Login() {
               </Link>
             </Flex>
             <button
-              type="submit" // Tambahkan type="submit"
+              type="submit"
               className="w-full bg-gray-600 text-black py-3 px-4 rounded-full mx-auto mt-10 flex justify-center items-center gap-1"
             >
               <span className="text-lg font-semibold">Login</span>

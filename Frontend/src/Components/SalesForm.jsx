@@ -1,10 +1,7 @@
-// Full code provided with fixes and adjustments for frontend and backend integration
-
-// --- Frontend ---
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Modal from "react-modal";
-import axios from "axios";
 
+// Styling untuk modal
 const customStyles = {
   content: {
     top: "50%",
@@ -27,49 +24,84 @@ const customStyles = {
   },
 };
 
+// Set elemen root untuk modal
 Modal.setAppElement("#root");
 
 const SalesForm = ({ isOpen, onRequestClose, fetchSales }) => {
+  // State untuk menyimpan data form
   const [formData, setFormData] = useState({
     kode_transaksi: "",
     produk_id: "",
+    sales_id: "",
     jumlah: "",
     total_harga: "",
-    keterangan: "",
+    nama_customer: "",
   });
 
-  const [errors, setErrors] = useState({});
-
+  // Handler untuk perubahan input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
-    }
   };
 
-  const validateForm = () => {
-    const errors = {};
-    if (!formData.kode_transaksi.trim())
-      errors.kode_transaksi = "Kode transaksi wajib diisi";
-    if (!formData.produk_id) errors.produk_id = "Produk ID wajib diisi";
-    if (!formData.jumlah) errors.jumlah = "Jumlah wajib diisi";
-    if (!formData.total_harga) errors.total_harga = "Total harga wajib diisi";
-    return errors;
-  };
-
+  // Handler untuk submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateForm();
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length === 0) {
-      try {
-        await axios.post("http://localhost:5000/sales/create", formData);
-        fetchSales(); // Refresh sales data after submission
-        onRequestClose(); // Close modal
-      } catch (error) {
-        console.error("Error submitting form", error);
+
+    // Validasi field yang wajib diisi
+    if (
+      !formData.kode_transaksi ||
+      !formData.produk_id ||
+      !formData.sales_id ||
+      !formData.jumlah ||
+      !formData.total_harga
+    ) {
+      alert(
+        "Harap isi semua field yang wajib: Kode Transaksi, Produk ID, Sales ID, Jumlah, dan Total Harga!"
+      );
+      return;
+    }
+
+    // Sanitize data sebelum dikirim ke backend
+    const sanitizedFormData = {
+      kode_transaksi: formData.kode_transaksi.trim(),
+      produk_id: parseInt(formData.produk_id),
+      sales_id: parseInt(formData.sales_id),
+      jumlah: parseInt(formData.jumlah),
+      total_harga: parseFloat(formData.total_harga),
+      nama_customer: formData.nama_customer.trim() || null,
+    };
+
+    console.log("Form data sebelum dikirim:", sanitizedFormData);
+
+    try {
+      // Kirim data ke backend
+      const response = await fetch("http://localhost:5000/penjual/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(sanitizedFormData),
+      });
+
+      const result = await response.json();
+      console.log("Response dari backend:", result);
+
+      // Jika sukses, refresh data dan tutup modal
+      if (response.ok) {
+        if (typeof fetchSales === "function") {
+          fetchSales(); // Refresh data penjualan
+        }
+        onRequestClose(); // Tutup modal
+      } else {
+        // Jika gagal, tampilkan pesan error dari backend
+        console.error("Error submitting form:", result);
+        alert(`Error: ${result.message}`);
       }
+    } catch (error) {
+      // Tangani error jaringan atau lainnya
+      console.error("Error submitting form:", error);
+      alert(`Error: ${error.message}`);
     }
   };
 
@@ -84,6 +116,7 @@ const SalesForm = ({ isOpen, onRequestClose, fetchSales }) => {
         Form Penjualan Barang
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Field: Kode Transaksi */}
         <div>
           <label className="block text-sm font-medium mb-1">
             Kode Transaksi
@@ -93,16 +126,12 @@ const SalesForm = ({ isOpen, onRequestClose, fetchSales }) => {
             name="kode_transaksi"
             value={formData.kode_transaksi}
             onChange={handleChange}
-            className={`w-full p-2 rounded bg-zinc-700 text-white ${
-              errors.kode_transaksi ? "border-red-500" : ""
-            }`}
+            className="w-full p-2 rounded bg-zinc-700 text-white"
+            required
           />
-          {errors.kode_transaksi && (
-            <span className="text-red-500 text-sm">
-              {errors.kode_transaksi}
-            </span>
-          )}
         </div>
+
+        {/* Field: Produk ID */}
         <div>
           <label className="block text-sm font-medium mb-1">Produk ID</label>
           <input
@@ -110,14 +139,25 @@ const SalesForm = ({ isOpen, onRequestClose, fetchSales }) => {
             name="produk_id"
             value={formData.produk_id}
             onChange={handleChange}
-            className={`w-full p-2 rounded bg-zinc-700 text-white ${
-              errors.produk_id ? "border-red-500" : ""
-            }`}
+            className="w-full p-2 rounded bg-zinc-700 text-white"
+            required
           />
-          {errors.produk_id && (
-            <span className="text-red-500 text-sm">{errors.produk_id}</span>
-          )}
         </div>
+
+        {/* Field: Sales ID */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Sales ID</label>
+          <input
+            type="number"
+            name="sales_id"
+            value={formData.sales_id}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-zinc-700 text-white"
+            required
+          />
+        </div>
+
+        {/* Field: Jumlah */}
         <div>
           <label className="block text-sm font-medium mb-1">Jumlah</label>
           <input
@@ -125,14 +165,12 @@ const SalesForm = ({ isOpen, onRequestClose, fetchSales }) => {
             name="jumlah"
             value={formData.jumlah}
             onChange={handleChange}
-            className={`w-full p-2 rounded bg-zinc-700 text-white ${
-              errors.jumlah ? "border-red-500" : ""
-            }`}
+            className="w-full p-2 rounded bg-zinc-700 text-white"
+            required
           />
-          {errors.jumlah && (
-            <span className="text-red-500 text-sm">{errors.jumlah}</span>
-          )}
         </div>
+
+        {/* Field: Total Harga */}
         <div>
           <label className="block text-sm font-medium mb-1">Total Harga</label>
           <input
@@ -140,23 +178,25 @@ const SalesForm = ({ isOpen, onRequestClose, fetchSales }) => {
             name="total_harga"
             value={formData.total_harga}
             onChange={handleChange}
-            className={`w-full p-2 rounded bg-zinc-700 text-white ${
-              errors.total_harga ? "border-red-500" : ""
-            }`}
+            className="w-full p-2 rounded bg-zinc-700 text-white"
+            required
           />
-          {errors.total_harga && (
-            <span className="text-red-500 text-sm">{errors.total_harga}</span>
-          )}
         </div>
+
+        {/* Field: Nama Customer */}
         <div>
-          <label className="block text-sm font-medium mb-1">Keterangan</label>
+          <label className="block text-sm font-medium mb-1">
+            Nama Customer
+          </label>
           <textarea
-            name="keterangan"
-            value={formData.keterangan}
+            name="nama_customer"
+            value={formData.nama_customer}
             onChange={handleChange}
             className="w-full p-2 rounded bg-zinc-700 text-white"
           ></textarea>
         </div>
+
+        {/* Tombol Batal dan Simpan */}
         <div className="flex justify-end space-x-4">
           <button
             type="button"
@@ -178,7 +218,3 @@ const SalesForm = ({ isOpen, onRequestClose, fetchSales }) => {
 };
 
 export default SalesForm;
-
-// --- Backend Adjustments ---
-// The backend code provided is already functional.
-// Ensure the database `penjualan` table is correctly set up, and the Express server is running.

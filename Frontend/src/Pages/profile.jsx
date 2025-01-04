@@ -16,19 +16,19 @@ export default function Profile() {
 
   let navigate = useNavigate();
 
-  useEffect(() => {
-    let data = AuthController(navigate);
-    SetDataUser(data);
-  }, []);
+  // useEffect(() => {
+  //   let data = AuthController(navigate);
+  //   SetDataUser(data);
+  // }, []);
 
-  const SavingOn = () => {
-    let x = UpdateProfileController({ image: Profile });
-    SetRespond(x);
-  };
+  // const SavingOn = () => {
+  //   let x = UpdateProfileController({ image: Profile });
+  //   SetRespond(x);
+  // };
 
   return (
     <>
-      <Navbar className={"mt-0"} />
+      {/* <Navbar className={"mt-0"} /> */}
 
       <div className="w-8/12 lg:w-[600px] mx-auto mt-24">
         <div className="bg-navy-800 rounded-xl shadow-lg p-6 relative overflow-hidden">

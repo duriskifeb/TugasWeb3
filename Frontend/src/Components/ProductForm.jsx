@@ -35,7 +35,7 @@ const ProductForm = ({ isOpen, onRequestClose }) => {
     hargaJual: "",
     stokTersedia: "",
     deskripsi: "",
-    statusProduk: "aktif"
+    statusProduk: "aktif",
   });
 
   const [errors, setErrors] = useState({});
@@ -62,7 +62,7 @@ const ProductForm = ({ isOpen, onRequestClose }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm(formData);
     setErrors(validationErrors);
@@ -74,11 +74,30 @@ const ProductForm = ({ isOpen, onRequestClose }) => {
         harga: formData.hargaJual,
         stok: formData.stokTersedia,
         deskripsi: formData.deskripsi,
-        status: formData.statusProduk
+        status: formData.statusProduk,
+        user_id: 1, // Anda bisa sesuaikan dengan ID pengguna yang login
       };
 
-      console.log("Form Data Submitted:", dataToSend);
-      onRequestClose(); // Tutup modal setelah submit
+      // Menggunakan fetch untuk mengirim data ke backend
+      try {
+        const response = await fetch("http://localhost:5000/product/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSend),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          console.log("Product created:", data.message);
+          onRequestClose(); // Tutup modal setelah submit
+        } else {
+          console.error("Error creating product:", data.message);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -228,7 +247,6 @@ const ProductForm = ({ isOpen, onRequestClose }) => {
           </select>
         </div>
 
-    
         {/* Tombol */}
         <div className="flex justify-end space-x-4 mt-6">
           <button

@@ -1,45 +1,28 @@
-import { Link, NavLink, useLocation, useNavigate } from "react-router";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../assets/LogoIconWeb.png";
 import { Button, Dropdown } from "antd";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
-import LogoutController, { AuthController } from "../Controller/user";
-import Category from "../data/category.json";
+import LogoutController from "../Controller/user"; // Pastikan LogoutController sesuai dengan kode yang Anda buat
 
 export default function Navbar({ className }) {
-  let { pathname } = useLocation();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
-  let [DataUser, SetDataUser] = useState(null);
-  let navigate = useNavigate();
-
-  let [NavMenu, setNavMenu] = useState([
+  const [navMenu, setNavMenu] = useState([
     { name: "Home", route: "/" },
-    { name: "Form", route: "/Form" },
-    { name: "Profile", route: "/Profile" },
-    { name: "history", route: "/history" },
+    { name: "Form", route: "/form" },
+    { name: "History", route: "/history" },
   ]);
 
   useEffect(() => {
-    let data = AuthController(navigate);
-    SetDataUser(data);
-    setNavMenu((dt) =>
-      dt.map((main) => {
-        if (main.name === "Category") {
-          const updatedRoute = [
-            ...main.route,
-            ...Category.map((element) => ({
-              key: "sdm_20" + element.name + element.uuid,
-              label: (
-                <Link to={`/category/${element.uuid}`}>{element.name}</Link>
-              ),
-            })),
-          ];
-          return { ...main, route: updatedRoute };
-        }
-        return main;
-      })
-    );
+    // Anda dapat menambahkan logika tambahan di sini
+    // Untuk mengambil data pengguna atau kategori, jika diperlukan.
   }, []);
+
+  const handleLogout = () => {
+    LogoutController(navigate); // Pastikan controller logout berjalan sesuai keinginan
+  };
 
   return (
     <nav
@@ -53,51 +36,30 @@ export default function Navbar({ className }) {
 
       {/* Navigation Links */}
       <ul className="hidden md:flex items-center gap-10">
-        {NavMenu.map((dt, id) => {
-          if (Array.isArray(dt.route)) {
-            return (
-              <li key={`navMenuT${id}`} className="relative group">
-                <Dropdown menu={{ items: dt.route }} trigger={["click"]}>
-                  <a
-                    onClick={(e) => e.preventDefault()}
-                    className={`flex items-center gap-2 text-sm ${
-                      pathname.startsWith("/category/")
-                        ? "text-white border-b-2 border-white"
-                        : "text-gray-400 hover:text-white"
-                    }`}
-                  >
-                    {dt.name} <Icon icon={"solar:alt-arrow-down-broken"} />
-                  </a>
-                </Dropdown>
-              </li>
-            );
-          } else {
-            return (
-              <li key={`navMenuT${id}`}>
-                <NavLink
-                  to={dt.route}
-                  className={({ isActive }) =>
-                    isActive
-                      ? "text-white border-b-2 border-white text-sm"
-                      : "text-black hover:text-white text-sm"
-                  }
-                >
-                  {dt.name}
-                </NavLink>
-              </li>
-            );
-          }
-        })}
+        {navMenu.map((menu, idx) => (
+          <li key={idx}>
+            <NavLink
+              to={menu.route}
+              className={({ isActive }) =>
+                isActive
+                  ? "text-white border-b-2 border-white text-sm"
+                  : "text-gray-400 hover:text-white text-sm"
+              }
+            >
+              {menu.name}
+            </NavLink>
+          </li>
+        ))}
       </ul>
 
-      {/* Logout */}
+      {/* Logout Button */}
       <div className="flex items-center gap-4">
         <Button
           type="primary"
-          onClick={() => LogoutController(navigate)}
+          onClick={handleLogout}
           className="flex items-center gap-2 px-4 py-2"
         >
-          <Icon icon={"heroicons-outline:logout"} className="text-xl" />
+          <Icon icon="heroicons-outline:logout" className="text-xl" />
           <span>Logout</span>
         </Button>
       </div>

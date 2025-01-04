@@ -6,6 +6,7 @@ const app = express();
 import dotenv from "dotenv";
 dotenv.config();
 import productRoutes from "./routes/productRoutes.js";
+import penjualRoutes from './routes/penjualanRoutes.js';
 
 // Middleware
 app.use(cors());
@@ -16,6 +17,8 @@ app.use("/user", userRoutes);
 
 // Tambahkan middleware untuk rute produk
 app.use("/product", productRoutes);
+
+app.use("/penjual", penjualRoutes);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
