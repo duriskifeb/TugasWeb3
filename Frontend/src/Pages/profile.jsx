@@ -5,24 +5,23 @@ import { Button, Flex, Image, Input, message } from "antd";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 export default function Profile() {
-  const [DataUser, setDataUser] = useState(null); // State untuk menyimpan data pengguna
-  const [Profile, setProfile] = useState(null); // State untuk menyimpan URL gambar profil
-  const [EditProfile, setEditProfile] = useState(false); // State untuk mode edit profil
-  const [Respond, setRespond] = useState(null); // State untuk menyimpan respons dari API
+  const [DataUser, setDataUser] = useState(null);
+  const [Profile, setProfile] = useState(null);
+  const [EditProfile, setEditProfile] = useState(false);
+  const [Respond, setRespond] = useState(null);
+  const [Loading, setLoading] = useState(false); // State untuk loading
 
   const navigate = useNavigate();
 
-  // Ambil data pengguna dari localStorage saat komponen dimuat
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
-      fetchUserProfile(user.id); // Ambil data profil dari backend
+      fetchUserProfile(user.id);
     } else {
-      navigate("/login"); // Jika tidak ada data pengguna, arahkan ke halaman login
+      navigate("/profile");
     }
   }, [navigate]);
 
-  // Fungsi untuk mengambil data profil dari backend
   const fetchUserProfile = async (userId) => {
     try {
       const response = await fetch(
@@ -40,16 +39,23 @@ export default function Profile() {
       }
 
       const data = await response.json();
-      setDataUser(data); // Set data pengguna ke state
-      setProfile(data.profile); // Set gambar profil dari data pengguna
+      if (!data) {
+        throw new Error("Data profil tidak ditemukan.");
+      }
+
+      setDataUser(data);
+      setProfile(data.profile); // Set URL gambar profil ke state
     } catch (error) {
       console.error("Failed to fetch user profile:", error);
       message.error("Gagal mengambil data profil.");
+      navigate("/login"); // Redirect ke halaman login jika terjadi error
     }
   };
 
-  // Fungsi untuk menyimpan perubahan profil
-  const SavingOn = async () => {
+  const SavingOn = async (e) => {
+    e?.preventDefault(); // Cegah refresh halaman jika dipanggil dari form
+    setLoading(true); // Set loading ke true
+
     try {
       const response = await fetch(
         "http://localhost:5000/user/update-profile",
@@ -68,20 +74,21 @@ export default function Profile() {
         throw new Error(result.message || "Gagal memperbarui profil.");
       }
 
-      // Update data pengguna di localStorage dan state
+      // Update data user di state dan localStorage
       const updatedUser = { ...DataUser, profile: Profile };
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setDataUser(updatedUser);
 
-      setRespond(result); // Set response ke state
+      setRespond(result);
       message.success("Profil berhasil diperbarui!");
       setEditProfile(false); // Tutup mode edit
-      setProfile(null); // Reset input URL gambar
     } catch (error) {
       console.error("Failed to update profile:", error);
       message.error(
         error.message || "Terjadi kesalahan saat memperbarui profil."
       );
+    } finally {
+      setLoading(false); // Set loading ke false setelah selesai
     }
   };
 
@@ -141,7 +148,7 @@ export default function Profile() {
                   type="primary"
                   onClick={() => {
                     setEditProfile(false);
-                    setProfile(null);
+                    setProfile(DataUser?.profile); // Reset ke URL sebelumnya
                     setRespond(null);
                   }}
                 >
@@ -184,6 +191,7 @@ export default function Profile() {
                 type="primary"
                 className="flex-1 bg-white/20 hover:bg-white/30 text-white border-none text-sm h-10"
                 onClick={SavingOn}
+                loading={Loading} // Tampilkan loading state
               >
                 Save Changes
               </Button>
