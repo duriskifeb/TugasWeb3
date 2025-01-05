@@ -47,6 +47,7 @@ export const getProductById = async (req, res) => {
 };
 
 // Update Product
+// Update Product
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
   const {
@@ -59,10 +60,33 @@ export const updateProduct = async (req, res) => {
     status,
     user_id,
   } = req.body;
+
+  // Pastikan semua field memiliki nilai yang valid
+  const updatedData = {
+    kode_produk: kode_produk || null,
+    nama: nama || null,
+    kategori: kategori || null,
+    harga: harga || null,
+    stok: stok || null,
+    deskripsi: deskripsi || null,
+    status: status || null,
+    user_id: user_id || null,
+  };
+
   try {
     await db.execute(
       "UPDATE produk SET kode_produk = ?, nama = ?, kategori = ?, harga = ?, stok = ?, deskripsi = ?, status = ?, user_id = ? WHERE id = ?",
-      [kode_produk, nama, kategori, harga, stok, deskripsi, status, user_id, id]
+      [
+        updatedData.kode_produk,
+        updatedData.nama,
+        updatedData.kategori,
+        updatedData.harga,
+        updatedData.stok,
+        updatedData.deskripsi,
+        updatedData.status,
+        updatedData.user_id,
+        id,
+      ]
     );
     res.status(200).json({ message: "Product updated successfully" });
   } catch (error) {
